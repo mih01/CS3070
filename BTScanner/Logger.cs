@@ -16,7 +16,7 @@ namespace BTScanner
 
         private string mLogDirectory = @"C:\FS_Log";
 
-        private string mLogfileName = "cs3070.log";
+        private string mLogfileName = "cs3070_log.txt";
 
         private Logger()
         {
@@ -97,28 +97,35 @@ namespace BTScanner
             {
                 lock (mLock)
                 {
-                    if (!Directory.Exists(mLogDirectory))
-                    {
-                        Directory.CreateDirectory(mLogDirectory);
-                    }
-
                     var location = Path.Combine(mLogDirectory, mLogfileName);
 
-                    if (File.Exists(location) && new FileInfo(location).Length > (1024 * 1024 * 2))
+                    try
                     {
-                        File.Move(location, location + ".a");
-                    }
-
-                    using (var w = new StreamWriter(location, true))
-                    {
-                        if (s != null)
+                        if (!Directory.Exists(mLogDirectory))
                         {
-                            w.WriteLine(DateTime.Now.ToString("yyyyMMdd hh:mm:ss") + " " + s);
+                            Directory.CreateDirectory(mLogDirectory);
                         }
 
-                        if (e != null)
+                        using (var w = new StreamWriter(location, true))
                         {
-                            w.WriteLine(DateTime.Now.ToString("yyyyMMdd hh:mm:ss") + " " + e.StackTrace);
+                            if (s != null)
+                            {
+                                w.WriteLine(DateTime.Now.ToString("yyyyMMdd hh:mm:ss") + " " + s);
+                            }
+
+                            if (e != null)
+                            {
+                                var now = DateTime.Now;
+                                w.WriteLine(now.ToString("yyyyMMdd hh:mm:ss") + " " + e.GetType().ToString());
+                                w.WriteLine(now.ToString("yyyyMMdd hh:mm:ss") + " " + e.StackTrace);
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        if (File.Exists(location) && new FileInfo(location).Length > (1024 * 1024 * 2))
+                        {
+                            File.Move(location, location + ".a");
                         }
                     }
                 }

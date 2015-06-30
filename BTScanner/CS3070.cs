@@ -116,6 +116,8 @@ namespace BTScanner
         {
             try
             {
+                Logger.Instance.Log(System.Reflection.MethodBase.GetCurrentMethod().Name);
+
                 Connected = connected;
                 ScannerID = (device != null && connected) ? device.DeviceName : string.Empty;
             }
